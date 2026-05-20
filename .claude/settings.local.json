@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(claude-api)",
+      "Bash(git -C \"D:\\\\OneDrive\\\\Programming\\\\Github\\\\gallery\" status)",
+      "WebSearch",
+      "WebFetch(domain:docs.amplify.aws)",
+      "WebFetch(domain:github.com)",
+      "Bash(npx --yes @aws-amplify/backend-cli --help)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(npx @aws-amplify/backend-cli generate --help)",
+      "WebFetch(domain:www.npmjs.com)",
+      "Bash(npx @aws-amplify/backend-cli sandbox --help)",
+      "Bash(npm --version)",
+      "Bash(npx create-next-app@latest:*)"
+    ]
+  }
+}
