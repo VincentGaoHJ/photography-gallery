@@ -1,60 +1,66 @@
 import Link from "next/link";
 import Image from "next/image";
+import clsx from "clsx";
 import type { BlogPostMeta } from "@/types/blog";
 
 interface BlogCardProps {
   post: BlogPostMeta;
 }
 
+// e.g. "2025-05-07" -> "5/7/25" (parsed by parts to avoid timezone drift)
+function shortDate(date: string): string {
+  const [y, m, d] = date.split("-").map(Number);
+  if (!y) return date;
+  return `${m}/${d}/${String(y).slice(2)}`;
+}
+
+/**
+ * Editorial blog row matching the original site: cover image on the left, with
+ * date / title / excerpt / "Read More" on the right. Degrades to a clean
+ * text-only block when a post has no cover image yet (text-only migration).
+ */
 export function BlogCard({ post }: BlogCardProps) {
+  const href = `/blog/${post.slug}`;
+  const hasImage = Boolean(post.coverImage);
+
   return (
-    <Link
-      href={`/blog/${post.slug}`}
-      className="group block"
-    >
-      <article>
-        {/* Cover image */}
-        {post.coverImage ? (
-          <div className="relative aspect-[16/10] overflow-hidden mb-5 bg-neutral-100">
+    <article className="grid grid-cols-1 items-center gap-8 md:grid-cols-2 md:gap-14">
+      {hasImage && (
+        <Link href={href} className="group block overflow-hidden bg-surface">
+          <div className="relative aspect-[4/3] w-full">
             <Image
-              src={post.coverImage}
+              src={post.coverImage as string}
               alt={post.title}
               fill
-              sizes="(max-width: 768px) 100vw, 33vw"
-              className="object-cover transition-transform duration-700 group-hover:scale-105"
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className="object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.04]"
             />
           </div>
-        ) : (
-          <div className="aspect-[16/10] bg-neutral-100 mb-5 flex items-center justify-center">
-            <span className="font-serif text-4xl text-neutral-300">
-              {post.title.charAt(0)}
-            </span>
-          </div>
-        )}
+        </Link>
+      )}
 
-        {/* Meta */}
-        <div className="flex items-center gap-3 text-xs text-muted mb-3">
-          <time dateTime={post.date}>
-            {new Date(post.date).toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}
-          </time>
-          <span aria-hidden="true">&middot;</span>
-          <span>{post.readingTime} min read</span>
-        </div>
+      <div className={clsx(!hasImage && "mx-auto max-w-2xl text-center")}>
+        <p className="font-heading text-lg italic text-muted">
+          {shortDate(post.date)}
+        </p>
 
-        {/* Title */}
-        <h3 className="font-serif text-xl font-medium tracking-tight mb-2 group-hover:opacity-70 transition-opacity">
-          {post.title}
-        </h3>
+        <Link href={href} className="group">
+          <h2 className="mt-2 font-heading text-4xl font-semibold leading-tight tracking-tight transition-colors group-hover:text-accent md:text-5xl">
+            {post.title}
+          </h2>
+        </Link>
 
-        {/* Excerpt */}
-        <p className="text-sm text-muted leading-relaxed line-clamp-2">
+        <p className="mt-5 line-clamp-3 leading-relaxed text-foreground/80 md:text-lg">
           {post.excerpt}
         </p>
-      </article>
-    </Link>
+
+        <Link
+          href={href}
+          className="mt-6 inline-block font-heading text-lg italic text-accent underline decoration-1 underline-offset-4 transition-colors hover:text-accent-hover"
+        >
+          Read More
+        </Link>
+      </div>
+    </article>
   );
 }

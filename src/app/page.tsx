@@ -1,13 +1,17 @@
-import { HeroSection } from "@/components/home/HeroSection";
-import { FeaturedWork } from "@/components/home/FeaturedWork";
-import { LatestPosts } from "@/components/home/LatestPosts";
+import { getGalleries } from "@/lib/galleries";
+import { Hero } from "@/components/home/Hero";
+import { PortfolioGrid } from "@/components/home/PortfolioGrid";
+import { LocationSection } from "@/components/home/LocationSection";
 
-export default function HomePage() {
+export const revalidate = 60;
+
+export default async function HomePage() {
+  const galleries = await getGalleries();
   return (
     <>
-      <HeroSection />
-      <FeaturedWork />
-      <LatestPosts />
+      <Hero />
+      <PortfolioGrid galleries={galleries} />
+      <LocationSection />
     </>
   );
 }

@@ -1,140 +1,57 @@
-import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import Link from "next/link";
+import type { Metadata } from "next";
+import { getGalleryBySlug, getGallerySlugs } from "@/lib/galleries";
+import { mediaUrl } from "@/lib/media";
+import { GalleryLightboxGrid } from "@/components/gallery/GalleryLightboxGrid";
 
-// This would be fetched from S3 in production
-const galleryItems: Record<string, {
-  key: string;
-  url: string;
-  category: string;
-  title: string;
-  description: string;
-  width: number;
-  height: number;
-}> = {
-  "portraits/portrait-1": {
-    key: "portraits/portrait-1",
-    url: "https://images.unsplash.com/photo-1554048612-b6a482bc67e5?w=1200&q=80",
-    category: "portraits",
-    title: "Morning Light",
-    description:
-      "A study in natural window light. The soft directional light creates depth while maintaining a gentle, ethereal quality.",
-    width: 1200,
-    height: 1600,
-  },
-  "editorial/editorial-1": {
-    key: "editorial/editorial-1",
-    url: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=1200&q=80",
-    category: "editorial",
-    title: "Urban Stories",
-    description:
-      "An editorial series exploring the intersection of fashion and cityscapes.",
-    width: 1200,
-    height: 800,
-  },
-  "commercial/commercial-1": {
-    key: "commercial/commercial-1",
-    url: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=1200&q=80",
-    category: "commercial",
-    title: "Brand Campaign",
-    description:
-      "Commercial work for lifestyle and fashion brands.",
-    width: 1200,
-    height: 1500,
-  },
-  "portraits/portrait-2": {
-    key: "portraits/portrait-2",
-    url: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=1200&q=80",
-    category: "portraits",
-    title: "Quiet Moment",
-    description:
-      "Capturing the in-between moments where true personality emerges.",
-    width: 1200,
-    height: 1800,
-  },
-};
-
-export async function generateMetadata({
-  params,
-}: {
+interface Props {
   params: Promise<{ slug: string }>;
-}): Promise<Metadata> {
-  const { slug } = await params;
-  const decodedSlug = decodeURIComponent(slug);
-  const item = galleryItems[decodedSlug];
+}
 
-  if (!item) {
-    return { title: "Not Found" };
-  }
+export const revalidate = 60;
+export const dynamicParams = true;
+
+export function generateStaticParams() {
+  return getGallerySlugs().map((slug) => ({ slug }));
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const gallery = await getGalleryBySlug(slug);
+  if (!gallery) return { title: "Not Found" };
 
   return {
-    title: item.title,
-    description: item.description,
-    openGraph: {
-      images: [item.url],
-    },
+    title: gallery.title,
+    openGraph: gallery.cover
+      ? { images: [mediaUrl(gallery.cover)] }
+      : undefined,
   };
 }
 
-export default async function GalleryDetailPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
+export default async function GalleryDetailPage({ params }: Props) {
   const { slug } = await params;
-  const decodedSlug = decodeURIComponent(slug);
-  const item = galleryItems[decodedSlug];
-
-  if (!item) {
-    return (
-      <div className="flex min-h-screen items-center justify-center pt-24">
-        <div className="text-center">
-          <h1 className="font-serif text-2xl">Image not found</h1>
-          <Link
-            href="/gallery"
-            className="mt-4 inline-block text-sm text-muted hover:text-foreground"
-          >
-            &larr; Back to Gallery
-          </Link>
-        </div>
-      </div>
-    );
-  }
+  const gallery = await getGalleryBySlug(slug);
+  if (!gallery) notFound();
 
   return (
-    <div className="min-h-screen pt-24 pb-16">
-      <div className="mx-auto max-w-6xl px-6">
-        {/* Back link */}
+    <div className="mx-auto max-w-[1500px] px-4 pb-24 pt-12 md:px-8 md:pt-16">
+      <header className="mx-auto mb-10 max-w-3xl text-center md:mb-14">
         <Link
-          href="/gallery"
-          className="inline-flex items-center gap-2 text-sm text-muted hover:text-foreground transition-colors mb-8"
+          href="/"
+          className="label mb-5 inline-block text-muted transition-colors hover:text-accent"
         >
-          &larr; Back to Gallery
+          ← Work
         </Link>
+        <h1 className="font-heading text-3xl font-medium tracking-tight md:text-5xl">
+          {gallery.title}
+        </h1>
+        <p className="label mt-4 text-muted">
+          {gallery.count} {gallery.count === 1 ? "photograph" : "photographs"}
+        </p>
+      </header>
 
-        {/* Image */}
-        <div className="relative w-full bg-neutral-100 mb-12">
-          <img
-            src={item.url}
-            alt={item.title}
-            className="w-full h-auto max-h-[80vh] object-contain mx-auto"
-          />
-        </div>
-
-        {/* Details */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="md:col-span-2">
-            <h1 className="font-serif text-3xl md:text-4xl font-medium tracking-tight mb-2">
-              {item.title}
-            </h1>
-            <p className="text-xs tracking-widest uppercase text-muted capitalize">
-              {item.category}
-            </p>
-          </div>
-          <div>
-            <p className="text-muted leading-relaxed">{item.description}</p>
-          </div>
-        </div>
-      </div>
+      <GalleryLightboxGrid items={gallery.items} />
     </div>
   );
 }

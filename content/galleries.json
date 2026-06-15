@@ -1,0 +1,249 @@
+{
+  "galleries": [
+    {
+      "slug": "tibet",
+      "title": "Northern Side of the Himalayas - Tibet, China",
+      "sourcePath": "/home/tibet",
+      "cover": {
+        "key": "tibet/cover-DSC00499.jpg",
+        "src": "https://images.squarespace-cdn.com/content/v1/60eb034b5145ce35fa1057f5/1626021545073-YPBNN16R31JVNJR0B3PR/DSC00499.jpg",
+        "width": 2500,
+        "height": 1361
+      },
+      "count": 23,
+      "items": [
+        {
+          "key": "tibet/DSC00499.jpg",
+          "src": "https://images.squarespace-cdn.com/content/v1/60eb034b5145ce35fa1057f5/1a7cc627-6d5d-42be-b8aa-2ab94523b172/DSC00499.jpg",
+          "width": 3343,
+          "height": 1820,
+          "alt": ""
+        },
+        {
+          "key": "tibet/白马林错.jpg",
+          "src": "https://images.squarespace-cdn.com/content/v1/60eb034b5145ce35fa1057f5/1626021776640-7HI5GUYYKKQ63LTY557O/%E7%99%BD%E9%A9%AC%E6%9E%97%E9%94%99.jpg",
+          "width": 1080,
+          "height": 1440,
+          "alt": ""
+        },
+        {
+          "key": "tibet/DSC02484-6.jpg",
+          "src": "https://images.squarespace-cdn.com/content/v1/60eb034b5145ce35fa1057f5/ead0968b-6cf9-4131-9a3c-dec0d9d59b71/DSC02484-6.jpg",
+          "width": 5000,
+          "height": 4000,
+          "alt": ""
+        },
+        {
+          "key": "tibet/DSC02489-4.jpg",
+          "src": "https://images.squarespace-cdn.com/content/v1/60eb034b5145ce35fa1057f5/e08ddb10-69fc-4480-b0e5-69541d5feacd/DSC02489-4.jpg",
+          "width": 5000,
+          "height": 4000,
+          "alt": ""
+        },
+        {
+          "key": "tibet/珠峰四人.jpg",
+          "src": "https://images.squarespace-cdn.com/content/v1/60eb034b5145ce35fa1057f5/cdc8e130-47a9-4c41-8cac-182d97570d09/%E7%8F%A0%E5%B3%B0%E5%9B%9B%E4%BA%BA.jpg",
+          "width": 5664,
+          "height": 3776,
+          "alt": ""
+        },
+        {
+          "key": "tibet/星轨_small.jpg",
+          "src": "https://images.squarespace-cdn.com/content/v1/60eb034b5145ce35fa1057f5/5451dde5-6e3f-44ea-8a74-4a737e1971d3/%E6%98%9F%E8%BD%A8_small.jpg",
+          "width": 3000,
+          "height": 2000,
+          "alt": ""
+        },
+        {
+          "key": "tibet/DSC03913-2.jpg",
+          "src": "https://images.squarespace-cdn.com/content/v1/60eb034b5145ce35fa1057f5/1c402d4c-c617-4a23-aa8e-cc3b69dfd82c/DSC03913-2.jpg",
+          "width": 1655,
+          "height": 2664,
+          "alt": "DSC03913-2.jpg"
+        },
+        {
+          "key": "tibet/DSC00551.jpg",
+          "src": "https://images.squarespace-cdn.com/content/v1/60eb034b5145ce35fa1057f5/87f829fa-1557-4bac-a2a6-3ac5687488a7/DSC00551.jpg",
+          "width": 3218,
+          "height": 3218,
+          "alt": "DSC00551.jpg"
+        },
+        {
+          "key": "tibet/DSC01034.jpg",
+          "src": "https://images.squarespace-cdn.com/content/v1/60eb034b5145ce35fa1057f5/b25bc12d-0290-48b2-87b6-66b086ec1fa4/DSC01034.jpg",
+          "width": 3013,
+          "height": 1835,
+          "alt": "DSC01034.jpg"
+        },
+        {
+          "key": "tibet/DSC00083-3.jpg",
+          "src": "https://images.squarespace-cdn.com/content/v1/60eb034b5145ce35fa1057f5/9b56a9f7-e3c3-421e-b51b-7ea3c135c6ce/DSC00083-3.jpg",
+          "width": 4114,
+          "height": 3186,
+          "alt": "DSC00083-3.jpg"
+        },
+        {
+          "key": "tibet/DSC00084-5.jpg",
+          "src": "https://images.squarespace-cdn.com/content/v1/60eb034b5145ce35fa1057f5/99a33b56-1e6b-4100-8c4f-6ddac2b2c4ac/DSC00084-5.jpg",
+          "width": 4880,
+          "height": 3685,
+          "alt": "DSC00084-5.jpg"
+        },
+        {
+          "key": "tibet/DSC02542.jpg",
+          "src": "https://images.squarespace-cdn.com/content/v1/60eb034b5145ce35fa1057f5/79321d06-f216-4b1c-a19b-9050795b7fa0/DSC02542.jpg",
+          "width": 6000,
+          "height": 4000,
+          "alt": "DSC02542.jpg"
+        },
+        {
+          "key": "tibet/DSC02681.jpg",
+          "src": "https://images.squarespace-cdn.com/content/v1/60eb034b5145ce35fa1057f5/f15bd1f8-0cf5-4eac-b31a-b838015eefff/DSC02681.jpg",
+          "width": 5895,
+          "height": 2996,
+          "alt": "DSC02681.jpg"
+        },
+        {
+          "key": "tibet/DSC00444.jpg",
+          "src": "https://images.squarespace-cdn.com/content/v1/60eb034b5145ce35fa1057f5/59ab826e-307c-40f5-af5a-8bae12d87e38/DSC00444.jpg",
+          "width": 6000,
+          "height": 4000,
+          "alt": "DSC00444.jpg"
+        },
+        {
+          "key": "tibet/DSC00549_small.jpg",
+          "src": "https://images.squarespace-cdn.com/content/v1/60eb034b5145ce35fa1057f5/5a1e3a49-edc2-4a59-9863-643384e88673/DSC00549_small.jpg",
+          "width": 2000,
+          "height": 3000,
+          "alt": "DSC00549_small.jpg"
+        },
+        {
+          "key": "tibet/DSC03860.jpg",
+          "src": "https://images.squarespace-cdn.com/content/v1/60eb034b5145ce35fa1057f5/6ad86342-1c5b-43de-bf02-94cc9fb961d5/DSC03860.jpg",
+          "width": 5127,
+          "height": 2804,
+          "alt": "DSC03860.jpg"
+        },
+        {
+          "key": "tibet/DSC02281.jpg",
+          "src": "https://images.squarespace-cdn.com/content/v1/60eb034b5145ce35fa1057f5/ce0c31ea-5ff5-44d1-aeeb-8d081674021a/DSC02281.jpg",
+          "width": 5491,
+          "height": 2337,
+          "alt": "DSC02281.jpg"
+        },
+        {
+          "key": "tibet/DSC02681-3_02.jpg",
+          "src": "https://images.squarespace-cdn.com/content/v1/60eb034b5145ce35fa1057f5/3bb72bc5-07e9-403c-a900-8da56a6b14ab/DSC02681-3_02.jpg",
+          "width": 2947,
+          "height": 2996,
+          "alt": "DSC02681-3_02.jpg"
+        },
+        {
+          "key": "tibet/DSC01616.jpg",
+          "src": "https://images.squarespace-cdn.com/content/v1/60eb034b5145ce35fa1057f5/ba5ef5de-621f-41d9-ab00-04e78dfe4f7f/DSC01616.jpg",
+          "width": 3681,
+          "height": 3681,
+          "alt": "DSC01616.jpg"
+        },
+        {
+          "key": "tibet/DSC03725.jpg",
+          "src": "https://images.squarespace-cdn.com/content/v1/60eb034b5145ce35fa1057f5/45316fa4-8b82-4104-a0bd-afe386542077/DSC03725.jpg",
+          "width": 5450,
+          "height": 3611,
+          "alt": "DSC03725.jpg"
+        },
+        {
+          "key": "tibet/IMG_0162-2.jpg",
+          "src": "https://images.squarespace-cdn.com/content/v1/60eb034b5145ce35fa1057f5/ecae951d-cadd-4bca-a534-996bdc6be525/IMG_0162-2.jpg",
+          "width": 4823,
+          "height": 3349,
+          "alt": "IMG_0162-2.jpg"
+        },
+        {
+          "key": "tibet/IMG_8540.JPG",
+          "src": "https://images.squarespace-cdn.com/content/v1/60eb034b5145ce35fa1057f5/0d374f53-a0b0-4a1a-9ec6-f421ec678d65/IMG_8540.JPG",
+          "width": 5184,
+          "height": 3456,
+          "alt": ""
+        },
+        {
+          "key": "tibet/DSC00816.jpg",
+          "src": "https://images.squarespace-cdn.com/content/v1/60eb034b5145ce35fa1057f5/ff40a474-6d3d-416e-92a0-11e085aa1a15/DSC00816.jpg",
+          "width": 6000,
+          "height": 4000,
+          "alt": ""
+        }
+      ]
+    },
+    {
+      "slug": "beijing",
+      "title": "China’s Capital - Beijing, China",
+      "sourcePath": "/home/beijing",
+      "cover": {
+        "key": "beijing/cover-DSC04136.jpg",
+        "src": "https://images.squarespace-cdn.com/content/v1/60eb034b5145ce35fa1057f5/1626022445970-VUWSEZPPTIQFF3OL0CT5/DSC04136.jpg",
+        "width": 2500,
+        "height": 1406
+      },
+      "count": 3,
+      "items": [
+        {
+          "key": "beijing/DSC04136.jpg",
+          "src": "https://images.squarespace-cdn.com/content/v1/60eb034b5145ce35fa1057f5/4445ff03-f3de-4d20-a3c1-4fafd9d12190/DSC04136.jpg",
+          "width": 6000,
+          "height": 3375,
+          "alt": ""
+        },
+        {
+          "key": "beijing/DSC04136-2.jpg",
+          "src": "https://images.squarespace-cdn.com/content/v1/60eb034b5145ce35fa1057f5/1626022224362-WXABU9UZAJM1K2XO2WQT/DSC04136.jpg",
+          "width": 2500,
+          "height": 1406,
+          "alt": "DSC04136.jpg"
+        },
+        {
+          "key": "beijing/DSC04126.jpg",
+          "src": "https://images.squarespace-cdn.com/content/v1/60eb034b5145ce35fa1057f5/1626022350181-F8IAZXWBJZU3EJ99E273/DSC04126.jpg",
+          "width": 2500,
+          "height": 3750,
+          "alt": "DSC04126.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "genyen",
+      "title": "The Heart of the Hengduan Mountain Range - Genyen, Sichuan",
+      "sourcePath": "/home/the-heart-of-the-hengduan-mountain-range-genyen-sichuan",
+      "cover": {
+        "key": "genyen/cover-DSC06656-1.jpg",
+        "src": "https://images.squarespace-cdn.com/content/v1/60eb034b5145ce35fa1057f5/1723474614810-L2HCORHOPSOJQ073L5MA/DSC06656-1.jpg",
+        "width": 5477,
+        "height": 3651
+      },
+      "count": 3,
+      "items": [
+        {
+          "key": "genyen/DSC06656-1.jpg",
+          "src": "https://images.squarespace-cdn.com/content/v1/60eb034b5145ce35fa1057f5/a537b85b-980e-4dfc-a85a-8357b2bc86a8/DSC06656-1.jpg",
+          "width": 5477,
+          "height": 3651,
+          "alt": ""
+        },
+        {
+          "key": "genyen/DSC06687-2.jpg",
+          "src": "https://images.squarespace-cdn.com/content/v1/60eb034b5145ce35fa1057f5/6c5bb7ee-57ba-4c0d-b27c-7402ec287627/DSC06687-2.jpg",
+          "width": 6000,
+          "height": 4000,
+          "alt": ""
+        },
+        {
+          "key": "genyen/DSC06705-1.jpg",
+          "src": "https://images.squarespace-cdn.com/content/v1/60eb034b5145ce35fa1057f5/3cae926a-89da-45e5-b34c-98b20558fcc2/DSC06705-1.jpg",
+          "width": 6000,
+          "height": 4000,
+          "alt": ""
+        }
+      ]
+    }
+  ]
+}

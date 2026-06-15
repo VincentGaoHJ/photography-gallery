@@ -10,7 +10,15 @@
       "WebFetch(domain:raw.githubusercontent.com)",
       "Bash(npx @aws-amplify/backend-cli generate --help)",
       "WebFetch(domain:www.npmjs.com)",
-      "Bash(npx @aws-amplify/backend-cli sandbox --help)"
+      "Bash(npx @aws-amplify/backend-cli sandbox --help)",
+      "Bash(npm --version)",
+      "Bash(npx create-next-app@latest:*)",
+      "Bash(npm create:*)",
+      "Bash(npm install:*)",
+      "Bash(npx next:*)",
+      "Bash(git init:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ]
   }
 }

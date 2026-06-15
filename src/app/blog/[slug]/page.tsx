@@ -1,9 +1,9 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
+import type { Metadata } from "next";
 import { getPostBySlug, getAllPosts } from "@/lib/blog";
 import { MarkdownRenderer } from "@/components/blog/MarkdownRenderer";
-import type { Metadata } from "next";
+import { MEDIA_BASE_URL } from "@/lib/constants";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -11,113 +11,62 @@ interface Props {
 
 export async function generateStaticParams() {
   const posts = await getAllPosts();
-  return posts
-    .filter((p) => !p.draft)
-    .map((post) => ({ slug: post.slug }));
+  return posts.filter((p) => !p.draft).map((post) => ({ slug: post.slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const post = await getPostBySlug(slug);
-
-  if (!post) {
-    return { title: "Not Found" };
-  }
-
-  return {
-    title: post.title,
-    description: post.excerpt,
-    openGraph: post.coverImage
-      ? {
-          images: [post.coverImage],
-        }
-      : undefined,
-  };
+  if (!post) return { title: "Not Found" };
+  return { title: post.title, description: post.excerpt };
 }
 
 export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params;
   const post = await getPostBySlug(slug);
-
   if (!post) notFound();
 
+  // Migrated posts store pre-cleaned HTML; future posts may be Markdown.
+  const isHtml = post.content.trimStart().startsWith("<");
+  // Once media lives on S3, rewrite the post's Squarespace CDN image URLs to the
+  // S3 key scheme (blog/<slug>/<filename>); otherwise keep the original CDN URL.
+  const html = MEDIA_BASE_URL
+    ? post.content.replace(
+        /https:\/\/images\.squarespace-cdn\.com\/content\/v1\/[^"')\s]+?\/([^"'/)\s]+\.(?:jpg|jpeg|png|webp|gif))/gi,
+        (_m, file) => `${MEDIA_BASE_URL.replace(/\/$/, "")}/blog/${slug}/${file}`,
+      )
+    : post.content;
+  const dateLabel = new Date(post.date).toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+  });
+
   return (
-    <article className="min-h-screen pt-24 pb-24">
-      <div className="mx-auto max-w-3xl px-6">
-        {/* Back link */}
+    <article className="mx-auto max-w-3xl px-6 py-14 md:py-20">
+      <p className="text-sm tracking-wide text-muted">
+        {dateLabel} <span className="mx-1.5">—</span> Written By {post.author}
+      </p>
+
+      <h1 className="mt-5 font-heading text-5xl font-semibold leading-[1.08] tracking-tight md:text-6xl">
+        {post.title}
+      </h1>
+
+      <div className="article-body mt-12">
+        {isHtml ? (
+          <div dangerouslySetInnerHTML={{ __html: html }} />
+        ) : (
+          <MarkdownRenderer content={post.content} />
+        )}
+      </div>
+
+      <footer className="mt-20 border-t border-border pt-8">
         <Link
           href="/blog"
-          className="inline-flex items-center gap-2 text-sm text-muted hover:text-foreground transition-colors mb-10"
+          className="label text-muted transition-colors hover:text-accent"
         >
-          &larr; Back to Journal
+          ← All posts
         </Link>
-
-        {/* Header */}
-        <header className="mb-12">
-          <div className="flex items-center gap-3 text-xs text-muted mb-4">
-            <time dateTime={post.date}>
-              {new Date(post.date).toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </time>
-            <span aria-hidden="true">&middot;</span>
-            <span>{post.readingTime} min read</span>
-          </div>
-
-          <h1 className="font-serif text-3xl md:text-5xl font-medium tracking-tight leading-tight mb-4">
-            {post.title}
-          </h1>
-
-          <p className="text-muted text-lg leading-relaxed">{post.excerpt}</p>
-
-          {post.tags.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-6">
-              {post.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="px-3 py-1 text-xs bg-neutral-100 rounded-full text-muted"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-          )}
-        </header>
-
-        {/* Cover image */}
-        {post.coverImage && (
-          <div className="relative aspect-[16/9] overflow-hidden bg-neutral-100 mb-12">
-            <Image
-              src={post.coverImage}
-              alt={post.title}
-              fill
-              sizes="(max-width: 768px) 100vw, 768px"
-              className="object-cover"
-              priority
-            />
-          </div>
-        )}
-
-        {/* Content */}
-        <div className="prose prose-neutral prose-lg max-w-none prose-headings:font-serif prose-headings:font-medium prose-headings:tracking-tight prose-a:text-accent prose-a:no-underline hover:prose-a:underline prose-img:rounded-none">
-          <MarkdownRenderer content={post.content} />
-        </div>
-
-        {/* Footer */}
-        <footer className="mt-16 pt-8 border-t border-border">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <p className="text-sm text-muted">Published by {post.author}</p>
-            <Link
-              href="/blog"
-              className="text-sm tracking-widest uppercase text-muted hover:text-foreground transition-colors"
-            >
-              All Posts &rarr;
-            </Link>
-          </div>
-        </footer>
-      </div>
+      </footer>
     </article>
   );
 }

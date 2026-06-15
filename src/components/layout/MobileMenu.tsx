@@ -18,11 +18,7 @@ export function MobileMenu({
   currentPath,
 }: MobileMenuProps) {
   useEffect(() => {
-    if (open) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
+    document.body.style.overflow = open ? "hidden" : "";
     return () => {
       document.body.style.overflow = "";
     };
@@ -33,8 +29,8 @@ export function MobileMenu({
       {/* Backdrop */}
       <div
         className={clsx(
-          "fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity md:hidden",
-          open ? "opacity-100" : "opacity-0 pointer-events-none"
+          "fixed inset-0 bg-foreground/40 backdrop-blur-sm transition-opacity md:hidden",
+          open ? "opacity-100" : "pointer-events-none opacity-0"
         )}
         onClick={onClose}
         aria-hidden="true"
@@ -43,26 +39,23 @@ export function MobileMenu({
       {/* Panel */}
       <nav
         className={clsx(
-          "fixed top-0 right-0 bottom-0 w-80 bg-background border-l border-border shadow-2xl md:hidden transition-transform duration-300 ease-out",
+          "fixed bottom-0 right-0 top-0 z-50 w-80 max-w-[80vw] border-l border-border bg-background shadow-2xl transition-transform duration-300 ease-out md:hidden",
           open ? "translate-x-0" : "translate-x-full"
         )}
         aria-label="Mobile navigation"
       >
         <div className="flex flex-col gap-1 p-8 pt-24">
-          {links.map((link, i) => (
+          {links.map((link) => (
             <Link
               key={link.href}
               href={link.href}
               onClick={onClose}
               className={clsx(
-                "py-3 font-serif text-2xl tracking-tight transition-opacity hover:opacity-70",
-                currentPath === link.href
-                  ? "opacity-100 text-accent"
-                  : "opacity-80",
-                // Stagger animation
-                open && "animate-[slideIn_0.3s_ease-out_both]"
+                "py-3 font-heading text-3xl tracking-tight transition-colors hover:text-accent",
+                currentPath.startsWith(link.href)
+                  ? "text-accent"
+                  : "text-foreground"
               )}
-              style={{ animationDelay: open ? `${i * 80}ms` : "0ms" }}
             >
               {link.label}
             </Link>

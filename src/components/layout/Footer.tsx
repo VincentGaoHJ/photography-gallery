@@ -1,65 +1,71 @@
-import { SITE_NAME, SOCIAL_LINKS } from "@/lib/constants";
+import Link from "next/link";
+import {
+  SITE_NAME,
+  NAV_LINKS,
+  CONTACT_EMAIL,
+  INSTAGRAM_URL,
+} from "@/lib/constants";
+
+const NEWSLETTER_BLURB =
+  "My entertaining and infrequent newsletter is full of stories, photography tips and images that don’t make it to the blog.";
+
+const FOOTER_LINKS = [{ href: "/", label: "Work" }, ...NAV_LINKS];
 
 export function Footer() {
   return (
     <footer className="border-t border-border bg-surface">
-      <div className="mx-auto max-w-7xl px-6 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-          {/* Brand */}
+      <div className="mx-auto max-w-[1500px] px-6 py-16 md:px-10">
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-3">
+          {/* Brand + newsletter blurb */}
           <div>
-            <p className="font-serif text-lg font-semibold">{SITE_NAME}</p>
-            <p className="mt-2 text-sm text-muted leading-relaxed max-w-xs">
-              Editorial and portrait photography. Capturing stories through
-              light and shadow.
+            <p className="font-heading text-2xl font-medium">{SITE_NAME}</p>
+            <p className="mt-3 max-w-xs leading-relaxed text-muted">
+              {NEWSLETTER_BLURB}
             </p>
           </div>
 
-          {/* Quick links */}
+          {/* Explore */}
           <div>
-            <p className="text-xs tracking-widest uppercase text-muted mb-4">
-              Navigate
-            </p>
+            <p className="label mb-4 text-muted">Explore</p>
             <div className="flex flex-col gap-2">
-              {[
-                { href: "/", label: "Home" },
-                { href: "/gallery", label: "Gallery" },
-                { href: "/blog", label: "Journal" },
-                { href: "/about", label: "About" },
-              ].map((link) => (
-                <a
+              {FOOTER_LINKS.map((link) => (
+                <Link
                   key={link.href}
                   href={link.href}
-                  className="text-sm text-muted hover:text-foreground transition-colors w-fit"
+                  className="w-fit text-muted transition-colors hover:text-accent"
                 >
                   {link.label}
-                </a>
+                </Link>
               ))}
             </div>
           </div>
 
-          {/* Social */}
+          {/* Contact */}
           <div>
-            <p className="text-xs tracking-widest uppercase text-muted mb-4">
-              Connect
-            </p>
+            <p className="label mb-4 text-muted">Contact</p>
             <div className="flex flex-col gap-2">
-              {Object.entries(SOCIAL_LINKS).map(([name, url]) => (
-                <a
-                  key={name}
-                  href={url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-muted hover:text-foreground transition-colors w-fit capitalize"
-                >
-                  {name}
-                </a>
-              ))}
+              <a
+                href={`mailto:${CONTACT_EMAIL}`}
+                className="w-fit text-muted transition-colors hover:text-accent"
+              >
+                {CONTACT_EMAIL}
+              </a>
+              <a
+                href={INSTAGRAM_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-fit text-muted transition-colors hover:text-accent"
+              >
+                Instagram
+              </a>
             </div>
           </div>
         </div>
 
-        <div className="mt-12 pt-6 border-t border-border text-xs text-muted">
-          &copy; {new Date().getFullYear()} {SITE_NAME}. All rights reserved.
+        <div className="mt-12 border-t border-border pt-6">
+          <p className="label text-muted">
+            © {new Date().getFullYear()} {SITE_NAME}
+          </p>
         </div>
       </div>
     </footer>

@@ -1,41 +1,47 @@
 import type { Metadata } from "next";
-import { Inter, Playfair_Display, Geist_Mono } from "next/font/google";
+import { Cormorant_Garamond, EB_Garamond, Poppins } from "next/font/google";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { SITE_NAME, SITE_DESCRIPTION, SITE_URL } from "@/lib/constants";
 import "./globals.css";
 
-const inter = Inter({
-  variable: "--font-inter",
+// Display serif for headings (matches the original "Cormorant Garamond").
+const cormorant = Cormorant_Garamond({
+  variable: "--font-cormorant",
   subsets: ["latin"],
-  display: "swap",
-});
-
-const playfair = Playfair_Display({
-  variable: "--font-playfair",
-  subsets: ["latin"],
-  display: "swap",
   weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+// Body serif — free stand-in for the original's paid "Adobe Garamond Pro".
+const ebGaramond = EB_Garamond({
+  variable: "--font-eb-garamond",
   subsets: ["latin"],
+  style: ["normal", "italic"],
+  display: "swap",
+});
+
+// Sans for small uppercase labels / nav.
+const poppins = Poppins({
+  variable: "--font-poppins",
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
   title: {
-    default: "Portfolio — Photographer Name",
-    template: "%s — Photographer Name",
+    default: SITE_NAME,
+    template: `%s — ${SITE_NAME}`,
   },
-  description:
-    "Editorial and portrait photography. Capturing stories through light and shadow.",
-  metadataBase: new URL("https://your-domain.com"),
+  description: SITE_DESCRIPTION,
+  metadataBase: new URL(SITE_URL),
   openGraph: {
-    title: "Photographer Name",
-    description:
-      "Editorial and portrait photography. Capturing stories through light and shadow.",
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
     type: "website",
-    siteName: "Photographer Name",
+    siteName: SITE_NAME,
   },
 };
 
@@ -47,7 +53,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${playfair.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${cormorant.variable} ${ebGaramond.variable} ${poppins.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-background text-foreground">
         <Header />
