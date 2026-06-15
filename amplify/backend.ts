@@ -21,17 +21,28 @@ const backend = defineBackend({
 });
 
 // IMPORTANT: create the distribution inside the STORAGE stack (not a separate
-// stack). OAC adds a bucket policy referencing the distribution; if the bucket
-// and distribution live in different nested stacks they reference each other and
-// CloudFormation reports a circular dependency.
+// stack). OAC adds a bucket policy referencing the distribution; in separate
+// nested stacks that creates a CloudFormation circular dependency.
 const bucket = backend.storage.resources.bucket;
+const s3Origin = S3BucketOrigin.withOriginAccessControl(bucket);
+
 const distribution = new Distribution(bucket.stack, "MediaCdn", {
   comment: "gaohaojun media delivery",
   defaultBehavior: {
-    origin: S3BucketOrigin.withOriginAccessControl(bucket),
+    // images/videos are immutable -> cache hard
+    origin: s3Origin,
     viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
     allowedMethods: AllowedMethods.ALLOW_GET_HEAD,
     cachePolicy: CachePolicy.CACHING_OPTIMIZED,
+  },
+  additionalBehaviors: {
+    // the editable manifest must stay fresh so /admin edits show quickly
+    "media/galleries.json": {
+      origin: s3Origin,
+      viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+      allowedMethods: AllowedMethods.ALLOW_GET_HEAD,
+      cachePolicy: CachePolicy.CACHING_DISABLED,
+    },
   },
 });
 
