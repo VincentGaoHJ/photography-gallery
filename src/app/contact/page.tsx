@@ -11,9 +11,9 @@ const CONTACT_HEADLINE =
 
 export default function ContactPage() {
   return (
-    <div className="mx-auto max-w-4xl px-6 py-20 md:px-10 md:py-28">
+    <div className="mx-auto max-w-[1500px] px-6 py-20 md:px-10 md:py-28">
       <p className="font-heading text-2xl italic text-muted">Contact</p>
-      <h1 className="mt-2 max-w-3xl font-heading text-3xl font-medium leading-tight tracking-tight md:text-5xl">
+      <h1 className="mt-2 max-w-5xl font-heading text-4xl font-medium leading-tight tracking-tight md:text-6xl">
         {CONTACT_HEADLINE}
       </h1>
 

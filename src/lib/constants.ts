@@ -21,7 +21,7 @@ export const BLOG_POSTS_PER_PAGE = 6;
 
 // Contact details (from the live site; email typo "gmial" corrected).
 export const CONTACT_EMAIL = "vincentgaohj@gmail.com";
-export const CONTACT_PHONE = "(+65) 8244-1306";
+export const CONTACT_PHONE = "(+86) 13701062275";
 
 export const INSTAGRAM_URL = "https://www.instagram.com/vincent_gaohj";
 
