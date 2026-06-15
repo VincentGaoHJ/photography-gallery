@@ -26,6 +26,15 @@ const backend = defineBackend({
 const bucket = backend.storage.resources.bucket;
 const s3Origin = S3BucketOrigin.withOriginAccessControl(bucket);
 
+// editable content (JSON manifests + blog post bodies) must stay fresh so
+// /admin edits show quickly; images/videos keep CACHING_OPTIMIZED.
+const freshBehavior = {
+  origin: s3Origin,
+  viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+  allowedMethods: AllowedMethods.ALLOW_GET_HEAD,
+  cachePolicy: CachePolicy.CACHING_DISABLED,
+};
+
 const distribution = new Distribution(bucket.stack, "MediaCdn", {
   comment: "gaohaojun media delivery",
   defaultBehavior: {
@@ -36,13 +45,8 @@ const distribution = new Distribution(bucket.stack, "MediaCdn", {
     cachePolicy: CachePolicy.CACHING_OPTIMIZED,
   },
   additionalBehaviors: {
-    // the editable manifest must stay fresh so /admin edits show quickly
-    "media/galleries.json": {
-      origin: s3Origin,
-      viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
-      allowedMethods: AllowedMethods.ALLOW_GET_HEAD,
-      cachePolicy: CachePolicy.CACHING_DISABLED,
-    },
+    "*.json": freshBehavior,
+    "media/blog/posts/*": freshBehavior,
   },
 });
 

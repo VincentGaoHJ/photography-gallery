@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { getPostBySlug, getAllPosts } from "@/lib/blog";
+import { getPostBySlug, getPostSlugs } from "@/lib/blog";
 import { MarkdownRenderer } from "@/components/blog/MarkdownRenderer";
 import { MEDIA_BASE_URL } from "@/lib/constants";
 
@@ -9,9 +9,11 @@ interface Props {
   params: Promise<{ slug: string }>;
 }
 
-export async function generateStaticParams() {
-  const posts = await getAllPosts();
-  return posts.filter((p) => !p.draft).map((post) => ({ slug: post.slug }));
+export const dynamicParams = true;
+export const revalidate = 60;
+
+export function generateStaticParams() {
+  return getPostSlugs().map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

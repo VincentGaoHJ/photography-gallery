@@ -7,6 +7,8 @@ export const metadata: Metadata = {
   description: "Travel journals and stories from behind the lens.",
 };
 
+export const revalidate = 60;
+
 export default async function BlogListPage() {
   const posts = (await getAllPosts()).filter((p) => !p.draft);
 
