@@ -13,21 +13,22 @@ import { storage } from "./storage/resource";
  * Backend:
  *  - auth: Cognito (email login) — gates the /admin editor.
  *  - storage: S3 bucket for media (media/*).
- *  - CloudFront (OAC) in front of the bucket so the public site has stable,
- *    cached image/video URLs while the bucket stays private.
+ *  - CloudFront (OAC) in front of the bucket for stable, cached public media URLs.
  */
 const backend = defineBackend({
   auth,
   storage,
 });
 
-const cdnStack = backend.createStack("media-cdn");
-const distribution = new Distribution(cdnStack, "MediaCdn", {
+// IMPORTANT: create the distribution inside the STORAGE stack (not a separate
+// stack). OAC adds a bucket policy referencing the distribution; if the bucket
+// and distribution live in different nested stacks they reference each other and
+// CloudFormation reports a circular dependency.
+const bucket = backend.storage.resources.bucket;
+const distribution = new Distribution(bucket.stack, "MediaCdn", {
   comment: "gaohaojun media delivery",
   defaultBehavior: {
-    origin: S3BucketOrigin.withOriginAccessControl(
-      backend.storage.resources.bucket
-    ),
+    origin: S3BucketOrigin.withOriginAccessControl(bucket),
     viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
     allowedMethods: AllowedMethods.ALLOW_GET_HEAD,
     cachePolicy: CachePolicy.CACHING_OPTIMIZED,
