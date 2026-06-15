@@ -196,13 +196,17 @@ export function BlogManager() {
             草稿(不公开)
           </label>
           <label className="block sm:col-span-2">
-            <span className="label text-muted">摘要</span>
+            <span className="label text-muted">介绍 / 摘要</span>
             <textarea
               value={e.excerpt}
               onChange={(ev) => set({ excerpt: ev.target.value })}
-              rows={2}
+              rows={3}
+              placeholder="单独写一段介绍 —— 与正文分开"
               className="mt-1 w-full border border-border bg-background px-3 py-2"
             />
+            <span className="mt-1 block text-xs text-muted">
+              这段「介绍」只显示在 /blog 列表卡片上,独立于正文(正文在下方富文本里写)。
+            </span>
           </label>
         </div>
 
