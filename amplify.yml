@@ -3,6 +3,7 @@ backend:
   phases:
     build:
       commands:
+        - npm ci
         - npx ampx pipeline-deploy --branch $AWS_BRANCH --app-id $AWS_APP_ID
 frontend:
   phases:
@@ -11,6 +12,8 @@ frontend:
         - npm ci
     build:
       commands:
+        # expose backend config to the client (for /admin) + build
+        - cp amplify_outputs.json public/amplify_outputs.json || true
         - npm run build
   artifacts:
     baseDirectory: .next

@@ -32,6 +32,11 @@
 /.payload/
 /media/
 
+# machine-local editor / tooling configs (not for the repo)
+.claude/settings.local*.json
+/.arts/
+/.codeartsdoer/
+
 # debug
 npm-debug.log*
 yarn-debug.log*
