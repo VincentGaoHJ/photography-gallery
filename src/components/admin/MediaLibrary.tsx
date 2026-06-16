@@ -2,9 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { remove } from "aws-amplify/storage";
-import { mediaUrl } from "@/lib/media";
 import { uploadToLibrary, createFolder } from "./mediaUpload";
 import { listAllMediaKeys, nodeAt, crumbs, KEEP } from "./mediaTree";
+import { MediaThumb } from "./MediaThumb";
 
 /**
  * Standalone media library — the home base for all uploaded media. Browse the
@@ -16,15 +16,23 @@ export function MediaLibrary() {
   const [allKeys, setAllKeys] = useState<string[]>([]);
   const [path, setPath] = useState(""); // current folder prefix, "" = root
   const [loading, setLoading] = useState(true);
+  const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
   const [q, setQ] = useState("");
   const [msg, setMsg] = useState("");
 
   const load = () => {
     setLoading(true);
+    setErr("");
     listAllMediaKeys()
-      .then(setAllKeys)
-      .catch(() => setAllKeys([]))
+      .then((ks) => {
+        setAllKeys(ks);
+        setErr("");
+      })
+      .catch((e) => {
+        setAllKeys([]);
+        setErr(e?.message || "加载失败");
+      })
       .finally(() => setLoading(false));
   };
 
@@ -180,6 +188,13 @@ export function MediaLibrary() {
 
       {loading ? (
         <p className="text-muted">加载素材库…</p>
+      ) : err ? (
+        <p className="text-sm text-red-600">
+          加载失败:{err}
+          <button type="button" onClick={load} className="ml-3 underline">
+            重试
+          </button>
+        </p>
       ) : q ? (
         searchHits.length === 0 ? (
           <p className="text-muted">没有匹配「{q}」的文件。</p>
@@ -244,13 +259,7 @@ function ImageGrid({
           className="group relative aspect-square overflow-hidden bg-surface"
           title={k}
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={mediaUrl({ key: k, src: "" })}
-            alt=""
-            loading="lazy"
-            className="h-full w-full object-cover"
-          />
+          <MediaThumb k={k} className="h-full w-full object-cover" />
           {showPath && (
             <span className="absolute inset-x-0 bottom-0 truncate bg-black/50 px-1 py-0.5 text-[10px] text-white">
               {k}

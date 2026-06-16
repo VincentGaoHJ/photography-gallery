@@ -14,6 +14,10 @@ frontend:
       commands:
         # expose backend config to the client (for /admin) + build
         - cp amplify_outputs.json public/amplify_outputs.json || true
+        # derive the public media base (CloudFront domain + /media prefix) from the
+        # backend outputs so the public site reads S3 manifests and resolves media URLs
+        - export NEXT_PUBLIC_MEDIA_BASE_URL=$(node scripts/media-base.mjs)
+        - echo "NEXT_PUBLIC_MEDIA_BASE_URL=$NEXT_PUBLIC_MEDIA_BASE_URL"
         - npm run build
   artifacts:
     baseDirectory: .next

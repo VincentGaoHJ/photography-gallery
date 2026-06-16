@@ -5,6 +5,7 @@ import { downloadData, uploadData } from "aws-amplify/storage";
 import seed from "../../../content/blog-seed.json";
 import { RichTextEditor } from "./RichTextEditor";
 import { MediaPicker } from "./MediaPicker";
+import { withTimeout } from "./mediaTree";
 
 type Post = {
   slug: string;
@@ -51,10 +52,15 @@ export function BlogManager() {
   useEffect(() => {
     (async () => {
       try {
-        const { body } = await downloadData({ path: INDEX_PATH }).result;
+        const { body } = await withTimeout(
+          downloadData({ path: INDEX_PATH }).result,
+          15000,
+          "加载文章"
+        );
         const data = JSON.parse(await body.text());
         setPosts(Array.isArray(data) ? data : data.posts ?? []);
       } catch {
+        // no S3 index yet (or it hung) -> show the git seed list
         setPosts(SEED.map(({ content: _c, ...meta }) => meta));
       } finally {
         setLoading(false);

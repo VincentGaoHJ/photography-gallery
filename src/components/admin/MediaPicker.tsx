@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { mediaUrl } from "@/lib/media";
 import { uploadToLibrary } from "./mediaUpload";
 import { listAllMediaKeys, nodeAt, crumbs } from "./mediaTree";
+import { MediaThumb } from "./MediaThumb";
 
 /**
  * Shared media library picker — browse the one S3 pool as folders and reuse any
@@ -24,6 +25,7 @@ export function MediaPicker({
   const [allKeys, setAllKeys] = useState<string[]>([]);
   const [path, setPath] = useState("");
   const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
   const [q, setQ] = useState("");
 
@@ -32,9 +34,16 @@ export function MediaPicker({
     setPath(initialFolder ? `${initialFolder.replace(/\/+$/, "")}/` : "");
     setQ("");
     setLoading(true);
+    setErr("");
     listAllMediaKeys()
-      .then(setAllKeys)
-      .catch(() => setAllKeys([]))
+      .then((ks) => {
+        setAllKeys(ks);
+        setErr("");
+      })
+      .catch((e) => {
+        setAllKeys([]);
+        setErr(e?.message || "加载失败");
+      })
       .finally(() => setLoading(false));
   }, [open, initialFolder]);
 
@@ -135,6 +144,8 @@ export function MediaPicker({
 
         {loading ? (
           <p className="text-muted">加载素材库…</p>
+        ) : err ? (
+          <p className="text-sm text-red-600">加载失败:{err}</p>
         ) : q ? (
           searchHits.length === 0 ? (
             <p className="text-muted">没有匹配「{q}」的文件。</p>
@@ -192,13 +203,7 @@ function PickGrid({
           title={k}
           onClick={() => onPick(k)}
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={mediaUrl({ key: k, src: "" })}
-            alt=""
-            loading="lazy"
-            className="h-full w-full object-cover"
-          />
+          <MediaThumb k={k} className="h-full w-full object-cover" />
           {showPath && (
             <span className="absolute inset-x-0 bottom-0 truncate bg-black/50 px-1 py-0.5 text-[10px] text-white">
               {k}

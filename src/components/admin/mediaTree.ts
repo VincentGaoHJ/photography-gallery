@@ -17,9 +17,24 @@ function isVisible(key: string): boolean {
   return base === KEEP || IMG_RE.test(base);
 }
 
+/** Reject if a promise doesn't settle in time, so a hung S3 call surfaces as an
+ *  error/fallback instead of an infinite spinner. */
+export function withTimeout<T>(p: Promise<T>, ms: number, label = "操作"): Promise<T> {
+  return Promise.race([
+    p,
+    new Promise<T>((_, reject) =>
+      setTimeout(() => reject(new Error(`${label}超时(${Math.round(ms / 1000)}s)`)), ms)
+    ),
+  ]);
+}
+
 /** All visible media keys, media-relative (the leading "media/" is stripped). */
 export async function listAllMediaKeys(): Promise<string[]> {
-  const res = await list({ path: "media/", options: { listAll: true } });
+  const res = await withTimeout(
+    list({ path: "media/", options: { listAll: true } }),
+    20000,
+    "列素材库"
+  );
   const keys = res.items
     .map((i) => i.path.replace(/^media\//, ""))
     .filter(isVisible);

@@ -21,6 +21,7 @@ import seed from "../../../content/galleries.json";
 import type { Gallery, GalleriesManifest, MediaItem } from "@/types/gallery";
 import { MediaPicker } from "./MediaPicker";
 import { uploadToLibrary } from "./mediaUpload";
+import { withTimeout } from "./mediaTree";
 
 const MANIFEST_PATH = "media/galleries.json";
 
@@ -131,7 +132,11 @@ export function GalleryManager({ onSignOut }: { onSignOut?: () => void }) {
   useEffect(() => {
     (async () => {
       try {
-        const { body } = await downloadData({ path: MANIFEST_PATH }).result;
+        const { body } = await withTimeout(
+          downloadData({ path: MANIFEST_PATH }).result,
+          15000,
+          "加载相册"
+        );
         const data = JSON.parse(await body.text()) as GalleriesManifest;
         setGalleries(data.galleries ?? []);
       } catch {
