@@ -99,6 +99,7 @@ export function RichTextEditor({
       <MediaPicker
         open={pickerOpen}
         onClose={() => setPickerOpen(false)}
+        initialFolder="blog"
         onSelect={(url) => editor.chain().focus().setImage({ src: url }).run()}
       />
     </div>

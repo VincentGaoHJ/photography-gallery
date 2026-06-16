@@ -1,19 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { list, remove } from "aws-amplify/storage";
+import { useEffect, useMemo, useState } from "react";
+import { remove } from "aws-amplify/storage";
 import { mediaUrl } from "@/lib/media";
-import { uploadToLibrary } from "./mediaUpload";
-
-const IMG_RE = /\.(jpe?g|png|webp|gif|avif)$/i;
+import { uploadToLibrary, createFolder } from "./mediaUpload";
+import { listAllMediaKeys, nodeAt, crumbs, KEEP } from "./mediaTree";
 
 /**
  * Standalone media library — the home base for all uploaded media. Browse the
- * whole S3 pool, batch-upload (deduped), search, and delete. The same pool is
- * what the gallery/blog pickers read from.
+ * one S3 pool as folders, create folders, batch-upload into the current folder
+ * (deduped), search, and delete. The gallery/blog pickers read from this same
+ * pool, so nothing is ever stored twice.
  */
 export function MediaLibrary() {
-  const [keys, setKeys] = useState<string[]>([]);
+  const [allKeys, setAllKeys] = useState<string[]>([]);
+  const [path, setPath] = useState(""); // current folder prefix, "" = root
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [q, setQ] = useState("");
@@ -21,20 +22,17 @@ export function MediaLibrary() {
 
   const load = () => {
     setLoading(true);
-    list({ path: "media/", options: { listAll: true } })
-      .then((res) => {
-        const found = res.items
-          .map((i) => i.path.replace(/^media\//, ""))
-          .filter((k) => k && !k.endsWith("/") && IMG_RE.test(k));
-        setKeys(Array.from(new Set(found)).sort());
-      })
-      .catch(() => setKeys([]))
+    listAllMediaKeys()
+      .then(setAllKeys)
+      .catch(() => setAllKeys([]))
       .finally(() => setLoading(false));
   };
 
   useEffect(() => {
     load();
   }, []);
+
+  const node = useMemo(() => nodeAt(allKeys, path), [allKeys, path]);
 
   const onUpload = async (files: FileList | null) => {
     if (!files?.length) return;
@@ -43,18 +41,33 @@ export function MediaLibrary() {
     let n = 0;
     for (const f of Array.from(files)) {
       try {
-        await uploadToLibrary(f);
+        await uploadToLibrary(f, path);
         n++;
       } catch {
         /* skip */
       }
     }
     setBusy(false);
-    setMsg(`已上传 ${n} 张`);
+    setMsg(`已上传 ${n} 张到 ${path || "根目录"}`);
     load();
   };
 
-  const del = async (key: string) => {
+  const onNewFolder = async () => {
+    const name = window.prompt("新文件夹名称(可用 / 建子文件夹)");
+    if (!name) return;
+    const safe = name.replace(/[^\w一-龥/-]+/g, "-").replace(/^\/+|\/+$/g, "");
+    if (!safe) return;
+    setBusy(true);
+    try {
+      await createFolder(`${path}${safe}`);
+      setMsg(`已新建文件夹「${safe}」`);
+      load();
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const delImage = async (key: string) => {
     if (
       !window.confirm(
         `删除 ${key}?\n请先确认没有相册/文章在用它,否则那里会显示破图。`
@@ -63,22 +76,51 @@ export function MediaLibrary() {
       return;
     try {
       await remove({ path: `media/${key}` });
-      setKeys((ks) => ks.filter((k) => k !== key));
+      setAllKeys((ks) => ks.filter((k) => k !== key));
       setMsg("已删除");
     } catch {
       setMsg("删除失败");
     }
   };
 
-  const shown = q
-    ? keys.filter((k) => k.toLowerCase().includes(q.toLowerCase()))
-    : keys;
+  const delFolder = async (folder: string) => {
+    const prefix = `${path}${folder}/`;
+    const inside = allKeys.filter(
+      (k) => k.startsWith(prefix) && k !== `${prefix}${KEEP}`
+    );
+    if (inside.length) {
+      setMsg(`「${folder}」非空(${inside.length} 项),请先清空再删`);
+      return;
+    }
+    if (!window.confirm(`删除空文件夹「${folder}」?`)) return;
+    try {
+      await remove({ path: `media/${prefix}${KEEP}` }).catch(() => {});
+      setMsg(`已删除文件夹「${folder}」`);
+      load();
+    } catch {
+      setMsg("删除失败");
+    }
+  };
+
+  // Search is a flat filter across the whole pool (ignores the current folder).
+  const searchHits = useMemo(() => {
+    if (!q) return [];
+    const t = q.toLowerCase();
+    return allKeys
+      .filter((k) => !k.endsWith(`/${KEEP}`) && k !== KEEP)
+      .filter((k) => k.toLowerCase().includes(t))
+      .sort();
+  }, [q, allKeys]);
+
+  const totalImages = allKeys.filter(
+    (k) => !k.endsWith(`/${KEEP}`) && k !== KEEP
+  ).length;
 
   return (
     <div>
-      <div className="mb-6 flex flex-wrap items-center gap-3">
+      <div className="mb-4 flex flex-wrap items-center gap-3">
         <label className="cursor-pointer bg-accent px-5 py-2 text-sm text-white">
-          {busy ? "上传中…" : "+ 上传图片"}
+          {busy ? "处理中…" : "+ 上传到当前文件夹"}
           <input
             type="file"
             multiple
@@ -87,52 +129,143 @@ export function MediaLibrary() {
             onChange={(e) => onUpload(e.target.files)}
           />
         </label>
+        <button
+          type="button"
+          onClick={onNewFolder}
+          className="border border-border px-4 py-2 text-sm hover:bg-surface"
+        >
+          + 新建文件夹
+        </button>
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="搜索文件名…"
+          placeholder="搜索全部文件名…"
           className="border border-border bg-background px-3 py-1.5 text-sm"
         />
         <span className="text-sm text-muted">
-          {keys.length} 张{msg && ` · ${msg}`}
+          共 {totalImages} 张{msg && ` · ${msg}`}
         </span>
       </div>
 
-      {loading ? (
-        <p className="text-muted">加载素材库…</p>
-      ) : shown.length === 0 ? (
-        <p className="text-muted">
-          {keys.length === 0
-            ? "还没有素材,点「上传图片」。"
-            : "没有匹配的文件。"}
-        </p>
-      ) : (
-        <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-6">
-          {shown.map((k) => (
-            <div
-              key={k}
-              className="group relative aspect-square overflow-hidden bg-surface"
-              title={k}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={mediaUrl({ key: k, src: "" })}
-                alt=""
-                loading="lazy"
-                className="h-full w-full object-cover"
-              />
+      {/* breadcrumb */}
+      {!q && (
+        <div className="mb-5 flex flex-wrap items-center gap-1 text-sm">
+          <button
+            type="button"
+            onClick={() => setPath("")}
+            className={
+              path === "" ? "text-foreground" : "text-accent hover:underline"
+            }
+          >
+            素材库
+          </button>
+          {crumbs(path).map((c) => (
+            <span key={c.prefix} className="flex items-center gap-1">
+              <span className="text-muted">/</span>
               <button
                 type="button"
-                onClick={() => del(k)}
-                className="absolute right-1 top-1 hidden h-6 w-6 items-center justify-center rounded-full bg-black/60 text-xs text-white group-hover:flex"
-                aria-label="删除"
+                onClick={() => setPath(c.prefix)}
+                className={
+                  c.prefix === path
+                    ? "text-foreground"
+                    : "text-accent hover:underline"
+                }
               >
-                ×
+                {c.name}
               </button>
-            </div>
+            </span>
           ))}
         </div>
       )}
+
+      {loading ? (
+        <p className="text-muted">加载素材库…</p>
+      ) : q ? (
+        searchHits.length === 0 ? (
+          <p className="text-muted">没有匹配「{q}」的文件。</p>
+        ) : (
+          <ImageGrid keys={searchHits} onDelete={delImage} showPath />
+        )
+      ) : (
+        <>
+          {node.folders.length > 0 && (
+            <div className="mb-6 grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-6">
+              {node.folders.map((f) => (
+                <div key={f} className="group relative">
+                  <button
+                    type="button"
+                    onClick={() => setPath(`${path}${f}/`)}
+                    className="flex aspect-square w-full flex-col items-center justify-center gap-2 border border-border bg-surface text-center hover:border-accent"
+                    title={f}
+                  >
+                    <span className="text-3xl">📁</span>
+                    <span className="line-clamp-2 px-2 text-xs">{f}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => delFolder(f)}
+                    className="absolute right-1 top-1 hidden h-6 w-6 items-center justify-center rounded-full bg-black/60 text-xs text-white group-hover:flex"
+                    aria-label="删除文件夹"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {node.images.length > 0 ? (
+            <ImageGrid keys={node.images} onDelete={delImage} />
+          ) : node.folders.length === 0 ? (
+            <p className="text-muted">
+              这个文件夹是空的,点「上传到当前文件夹」或「新建文件夹」。
+            </p>
+          ) : null}
+        </>
+      )}
+    </div>
+  );
+}
+
+function ImageGrid({
+  keys,
+  onDelete,
+  showPath,
+}: {
+  keys: string[];
+  onDelete: (key: string) => void;
+  showPath?: boolean;
+}) {
+  return (
+    <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-6">
+      {keys.map((k) => (
+        <div
+          key={k}
+          className="group relative aspect-square overflow-hidden bg-surface"
+          title={k}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={mediaUrl({ key: k, src: "" })}
+            alt=""
+            loading="lazy"
+            className="h-full w-full object-cover"
+          />
+          {showPath && (
+            <span className="absolute inset-x-0 bottom-0 truncate bg-black/50 px-1 py-0.5 text-[10px] text-white">
+              {k}
+            </span>
+          )}
+          <button
+            type="button"
+            onClick={() => onDelete(k)}
+            className="absolute right-1 top-1 hidden h-6 w-6 items-center justify-center rounded-full bg-black/60 text-xs text-white group-hover:flex"
+            aria-label="删除"
+          >
+            ×
+          </button>
+        </div>
+      ))}
     </div>
   );
 }

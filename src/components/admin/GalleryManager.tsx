@@ -206,7 +206,8 @@ export function GalleryManager({ onSignOut }: { onSignOut?: () => void }) {
     const added: MediaItem[] = [];
     for (const file of Array.from(files)) {
       try {
-        const { key } = await uploadToLibrary(file); // one shared pool + dedup
+        // one shared pool + dedup; auto-organized into a folder named after the gallery
+        const { key } = await uploadToLibrary(file, galleries[gi].slug);
         if (existing.has(key) || added.some((a) => a.key === key)) continue;
         const { w, h } = await readDims(file);
         added.push({ key, src: "", width: w || null, height: h || null, alt: "" });
@@ -371,6 +372,7 @@ export function GalleryManager({ onSignOut }: { onSignOut?: () => void }) {
       <MediaPicker
         open={pickerGi !== null}
         onClose={() => setPickerGi(null)}
+        initialFolder={pickerGi !== null ? galleries[pickerGi].slug : ""}
         onSelect={(url, key) => {
           if (pickerGi !== null) addFromLibrary(pickerGi, url, key);
         }}

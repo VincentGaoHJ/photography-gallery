@@ -232,6 +232,7 @@ export function BlogManager() {
         <MediaPicker
           open={coverPicker}
           onClose={() => setCoverPicker(false)}
+          initialFolder="blog"
           onSelect={(url) => set({ coverImage: url })}
         />
       </div>
