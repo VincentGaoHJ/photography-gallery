@@ -20,6 +20,7 @@ import { CSS } from "@dnd-kit/utilities";
 import seed from "../../../content/galleries.json";
 import type { Gallery, GalleriesManifest, MediaItem } from "@/types/gallery";
 import { MediaPicker } from "./MediaPicker";
+import { uploadToLibrary } from "./mediaLibrary";
 
 const MANIFEST_PATH = "media/galleries.json";
 
@@ -200,17 +201,13 @@ export function GalleryManager({ onSignOut }: { onSignOut?: () => void }) {
 
   const onUpload = async (gi: number, files: FileList | null) => {
     if (!files?.length) return;
-    const slug = galleries[gi].slug;
     setMsg("上传中…");
+    const existing = new Set(galleries[gi].items.map((it) => it.key));
     const added: MediaItem[] = [];
     for (const file of Array.from(files)) {
-      const key = `${slug}/${file.name}`;
       try {
-        await uploadData({
-          path: `media/${key}`,
-          data: file,
-          options: { contentType: file.type },
-        }).result;
+        const { key } = await uploadToLibrary(file); // one shared pool + dedup
+        if (existing.has(key) || added.some((a) => a.key === key)) continue;
         const { w, h } = await readDims(file);
         added.push({ key, src: "", width: w || null, height: h || null, alt: "" });
       } catch {
@@ -374,7 +371,6 @@ export function GalleryManager({ onSignOut }: { onSignOut?: () => void }) {
       <MediaPicker
         open={pickerGi !== null}
         onClose={() => setPickerGi(null)}
-        uploadPrefix={pickerGi !== null ? galleries[pickerGi]?.slug : undefined}
         onSelect={(url, key) => {
           if (pickerGi !== null) addFromLibrary(pickerGi, url, key);
         }}

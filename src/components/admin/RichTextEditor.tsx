@@ -16,11 +16,9 @@ import { MediaPicker } from "./MediaPicker";
 export function RichTextEditor({
   value,
   onChange,
-  uploadPrefix,
 }: {
   value: string;
   onChange: (html: string) => void;
-  uploadPrefix?: string;
 }) {
   const [pickerOpen, setPickerOpen] = useState(false);
 
@@ -101,7 +99,6 @@ export function RichTextEditor({
       <MediaPicker
         open={pickerOpen}
         onClose={() => setPickerOpen(false)}
-        uploadPrefix={uploadPrefix}
         onSelect={(url) => editor.chain().focus().setImage({ src: url }).run()}
       />
     </div>

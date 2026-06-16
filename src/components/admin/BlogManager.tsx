@@ -140,7 +140,6 @@ export function BlogManager() {
   if (editing) {
     const e = editing;
     const set = (patch: Partial<Post>) => setEditing({ ...e, ...patch });
-    const slugPrefix = `blog/${e.slug || slugify(e.title)}`;
     return (
       <div>
         <div className="mb-5 flex flex-wrap items-center gap-3">
@@ -226,18 +225,13 @@ export function BlogManager() {
         <div className="mt-6">
           <span className="label text-muted">正文</span>
           <div className="mt-2">
-            <RichTextEditor
-              value={content}
-              onChange={setContent}
-              uploadPrefix={slugPrefix}
-            />
+            <RichTextEditor value={content} onChange={setContent} />
           </div>
         </div>
 
         <MediaPicker
           open={coverPicker}
           onClose={() => setCoverPicker(false)}
-          uploadPrefix={slugPrefix}
           onSelect={(url) => set({ coverImage: url })}
         />
       </div>
