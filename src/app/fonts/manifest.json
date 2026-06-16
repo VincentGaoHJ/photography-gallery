@@ -1,0 +1,62 @@
+[
+  {
+    "file": "cormorant-400-italic.woff2",
+    "weight": "400",
+    "style": "italic",
+    "prefix": "cormorant"
+  },
+  {
+    "file": "cormorant-500-italic.woff2",
+    "weight": "500",
+    "style": "italic",
+    "prefix": "cormorant"
+  },
+  {
+    "file": "cormorant-400-normal.woff2",
+    "weight": "400",
+    "style": "normal",
+    "prefix": "cormorant"
+  },
+  {
+    "file": "cormorant-500-normal.woff2",
+    "weight": "500",
+    "style": "normal",
+    "prefix": "cormorant"
+  },
+  {
+    "file": "cormorant-600-normal.woff2",
+    "weight": "600",
+    "style": "normal",
+    "prefix": "cormorant"
+  },
+  {
+    "file": "ebgaramond-400-600-italic.woff2",
+    "weight": "400 600",
+    "style": "italic",
+    "prefix": "ebgaramond"
+  },
+  {
+    "file": "ebgaramond-400-600-normal.woff2",
+    "weight": "400 600",
+    "style": "normal",
+    "prefix": "ebgaramond"
+  },
+  {
+    "file": "poppins-400-normal.woff2",
+    "weight": "400",
+    "style": "normal",
+    "prefix": "poppins"
+  },
+  {
+    "file": "poppins-500-normal.woff2",
+    "weight": "500",
+    "style": "normal",
+    "prefix": "poppins"
+  },
+  {
+    "file": "poppins-600-normal.woff2",
+    "weight": "600",
+    "style": "normal",
+    "prefix": "poppins"
+  }
+]
