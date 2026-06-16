@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { list } from "aws-amplify/storage";
 import { mediaUrl } from "@/lib/media";
-import { uploadToLibrary } from "./mediaLibrary";
+import { uploadToLibrary } from "./mediaUpload";
 
 const IMG_RE = /\.(jpe?g|png|webp|gif|avif)$/i;
 

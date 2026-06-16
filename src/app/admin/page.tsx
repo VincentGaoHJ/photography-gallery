@@ -7,6 +7,7 @@ import "@aws-amplify/ui-react/styles.css";
 import outputs from "../../../amplify_outputs.json";
 import { GalleryManager } from "@/components/admin/GalleryManager";
 import { BlogManager } from "@/components/admin/BlogManager";
+import { MediaLibrary } from "@/components/admin/MediaLibrary";
 
 // Standard Amplify Gen 2 config: amplify_outputs.json is generated at the repo
 // root by the backend build phase (and kept locally, gitignored).
@@ -28,7 +29,7 @@ export default function AdminPage() {
 }
 
 function AdminTabs({ onSignOut }: { onSignOut?: () => void }) {
-  const [tab, setTab] = useState<"galleries" | "blog">("galleries");
+  const [tab, setTab] = useState<"galleries" | "blog" | "media">("galleries");
   return (
     <div>
       <div className="mb-8 flex items-center gap-1 border-b border-border">
@@ -37,6 +38,9 @@ function AdminTabs({ onSignOut }: { onSignOut?: () => void }) {
         </TabButton>
         <TabButton active={tab === "blog"} onClick={() => setTab("blog")}>
           博客
+        </TabButton>
+        <TabButton active={tab === "media"} onClick={() => setTab("media")}>
+          素材库
         </TabButton>
         {onSignOut && (
           <button
@@ -47,7 +51,13 @@ function AdminTabs({ onSignOut }: { onSignOut?: () => void }) {
           </button>
         )}
       </div>
-      {tab === "galleries" ? <GalleryManager /> : <BlogManager />}
+      {tab === "galleries" ? (
+        <GalleryManager />
+      ) : tab === "blog" ? (
+        <BlogManager />
+      ) : (
+        <MediaLibrary />
+      )}
     </div>
   );
 }

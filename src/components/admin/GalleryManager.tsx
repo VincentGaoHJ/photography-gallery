@@ -20,7 +20,7 @@ import { CSS } from "@dnd-kit/utilities";
 import seed from "../../../content/galleries.json";
 import type { Gallery, GalleriesManifest, MediaItem } from "@/types/gallery";
 import { MediaPicker } from "./MediaPicker";
-import { uploadToLibrary } from "./mediaLibrary";
+import { uploadToLibrary } from "./mediaUpload";
 
 const MANIFEST_PATH = "media/galleries.json";
 
