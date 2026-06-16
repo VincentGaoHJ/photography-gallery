@@ -7,14 +7,25 @@ export function LocationSection() {
       </h2>
 
       <div className="mt-12 overflow-hidden bg-surface">
+        {/* OpenStreetMap embed — keyless and reachable both inside the GFW and
+            abroad (Google Maps is blocked in mainland China, which threw a
+            client-side TimeoutError on this page). */}
         <iframe
           title="Current location — Beijing, China"
-          src="https://www.google.com/maps?q=Beijing,China&z=10&output=embed"
+          src="https://www.openstreetmap.org/export/embed.html?bbox=115.70,39.45,117.10,40.35&layer=mapnik&marker=39.9042,116.4074"
           className="h-[420px] w-full border-0 md:h-[560px]"
           loading="lazy"
           referrerPolicy="no-referrer-when-downgrade"
         />
       </div>
+      <a
+        href="https://www.openstreetmap.org/?mlat=39.9042&mlon=116.4074#map=10/39.9042/116.4074"
+        target="_blank"
+        rel="noreferrer"
+        className="label mt-3 inline-block text-xs text-muted transition-colors hover:text-accent"
+      >
+        View larger map
+      </a>
     </section>
   );
 }
