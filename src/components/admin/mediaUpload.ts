@@ -1,6 +1,7 @@
-import { uploadData, getProperties } from "aws-amplify/storage";
 import { mediaUrl } from "@/lib/media";
 import { KEEP } from "./mediaTree";
+import { apiUpload, apiSave } from "./adminApi";
+import { resizeImage } from "./imageResize";
 
 /** Normalize a folder prefix to "" or "a/b/" (no leading slash, trailing slash). */
 function normFolder(folder?: string): string {
@@ -10,34 +11,19 @@ function normFolder(folder?: string): string {
 
 /**
  * Single shared media library: every upload goes to one pool (media/) and is
- * deduped by path, so an image is stored once and referenced (by key) from any
- * gallery or blog post — never duplicated per section. `folder` picks the
- * sub-folder it lands in ("" = library root); the returned key is the
- * media-relative path used everywhere else.
+ * deduped server-side, so an image is stored once and referenced (by key) from
+ * any gallery or blog post — never duplicated per section. `folder` picks the
+ * sub-folder ("" = library root). The file is web-resized in the browser, then
+ * sent to the API route which does the S3 write inside AWS.
  */
 export async function uploadToLibrary(
   file: File,
   folder?: string
 ): Promise<{ key: string; url: string }> {
-  const name = file.name.replace(/\s+/g, "-");
-  const key = `${normFolder(folder)}${name}`;
-  const path = `media/${key}`;
-
-  let exists = false;
-  try {
-    await getProperties({ path });
-    exists = true; // same path already in the library -> reuse, don't duplicate
-  } catch {
-    exists = false;
-  }
-  if (!exists) {
-    await uploadData({
-      path,
-      data: file,
-      options: { contentType: file.type },
-    }).result;
-  }
-
+  const { blob, filename } = await resizeImage(file);
+  const safe = filename.replace(/\s+/g, "-");
+  const key = `${normFolder(folder)}${safe}`;
+  await apiUpload(blob, key, safe); // dedup happens server-side
   return { key, url: mediaUrl({ key, src: "" }) };
 }
 
@@ -48,9 +34,5 @@ export async function uploadToLibrary(
 export async function createFolder(folder: string): Promise<void> {
   const f = normFolder(folder);
   if (!f) return;
-  await uploadData({
-    path: `media/${f}${KEEP}`,
-    data: new Blob([""], { type: "text/plain" }),
-    options: { contentType: "text/plain" },
-  }).result;
+  await apiSave(`${f}${KEEP}`, "", "text/plain");
 }

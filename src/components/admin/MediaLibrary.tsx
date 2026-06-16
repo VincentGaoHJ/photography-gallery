@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { remove } from "aws-amplify/storage";
 import { uploadToLibrary, createFolder } from "./mediaUpload";
 import { listAllMediaKeys, nodeAt, crumbs, KEEP } from "./mediaTree";
 import { MediaThumb } from "./MediaThumb";
+import { apiDelete } from "./adminApi";
 
 /**
  * Standalone media library — the home base for all uploaded media. Browse the
@@ -83,7 +83,7 @@ export function MediaLibrary() {
     )
       return;
     try {
-      await remove({ path: `media/${key}` });
+      await apiDelete(key);
       setAllKeys((ks) => ks.filter((k) => k !== key));
       setMsg("已删除");
     } catch {
@@ -102,7 +102,7 @@ export function MediaLibrary() {
     }
     if (!window.confirm(`删除空文件夹「${folder}」?`)) return;
     try {
-      await remove({ path: `media/${prefix}${KEEP}` }).catch(() => {});
+      await apiDelete(`${prefix}${KEEP}`).catch(() => {});
       setMsg(`已删除文件夹「${folder}」`);
       load();
     } catch {

@@ -1,11 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { downloadData, uploadData } from "aws-amplify/storage";
 import seed from "../../../content/blog-seed.json";
 import { RichTextEditor } from "./RichTextEditor";
 import { MediaPicker } from "./MediaPicker";
-import { withTimeout } from "./mediaTree";
+import { cdnJson, cdnText, apiSave, apiDelete } from "./adminApi";
 
 type Post = {
   slug: string;
@@ -19,8 +18,8 @@ type Post = {
   content?: string;
 };
 
-const INDEX_PATH = "media/blog/index.json";
-const bodyPath = (slug: string) => `media/blog/posts/${slug}.html`;
+const INDEX_PATH = "blog/index.json";
+const bodyPath = (slug: string) => `blog/posts/${slug}.html`;
 const SEED = (seed as { posts: Post[] }).posts;
 
 function slugify(s: string): string {
@@ -33,11 +32,7 @@ function slugify(s: string): string {
 }
 
 async function writeJson(path: string, data: unknown) {
-  await uploadData({
-    path,
-    data: new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }),
-    options: { contentType: "application/json" },
-  }).result;
+  await apiSave(path, JSON.stringify(data, null, 2), "application/json");
 }
 
 export function BlogManager() {
@@ -51,31 +46,19 @@ export function BlogManager() {
 
   useEffect(() => {
     (async () => {
-      try {
-        const { body } = await withTimeout(
-          downloadData({ path: INDEX_PATH }).result,
-          15000,
-          "加载文章"
-        );
-        const data = JSON.parse(await body.text());
-        setPosts(Array.isArray(data) ? data : data.posts ?? []);
-      } catch {
-        // no S3 index yet (or it hung) -> show the git seed list
-        setPosts(SEED.map(({ content: _c, ...meta }) => meta));
-      } finally {
-        setLoading(false);
-      }
+      // read the blog index via the CDN; fall back to the git seed list
+      const data = await cdnJson<Post[] | { posts: Post[] }>(INDEX_PATH);
+      const list = Array.isArray(data) ? data : data?.posts;
+      setPosts(list ?? SEED.map(({ content: _c, ...meta }) => meta));
+      setLoading(false);
     })();
   }, []);
 
   async function openEdit(p: Post) {
-    let body = "";
-    try {
-      const res = await downloadData({ path: bodyPath(p.slug) }).result;
-      body = await res.body.text();
-    } catch {
-      body = SEED.find((x) => x.slug === p.slug)?.content ?? "";
-    }
+    const body =
+      (await cdnText(bodyPath(p.slug))) ??
+      SEED.find((x) => x.slug === p.slug)?.content ??
+      "";
     setContent(body);
     setEditing(p);
   }
@@ -100,11 +83,7 @@ export function BlogManager() {
     setSaving(true);
     setMsg("");
     try {
-      await uploadData({
-        path: bodyPath(slug),
-        data: new Blob([content], { type: "text/html" }),
-        options: { contentType: "text/html" },
-      }).result;
+      await apiSave(bodyPath(slug), content, "text/html");
       const meta: Post = {
         slug,
         title: editing.title || "Untitled",
@@ -122,8 +101,8 @@ export function BlogManager() {
       setPosts(next);
       setEditing(null);
       setMsg("已保存 ✓ 线上约 1 分钟更新");
-    } catch {
-      setMsg("保存失败,请重试");
+    } catch (e) {
+      setMsg(e instanceof Error ? e.message : "保存失败,请重试");
     } finally {
       setSaving(false);
     }
@@ -134,6 +113,7 @@ export function BlogManager() {
     const next = posts.filter((p) => p.slug !== slug);
     try {
       await writeJson(INDEX_PATH, { posts: next });
+      await apiDelete(bodyPath(slug)).catch(() => {});
       setPosts(next);
       setMsg("已删除");
     } catch {

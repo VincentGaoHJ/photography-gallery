@@ -1,6 +1,6 @@
 "use client";
 
-import { list } from "aws-amplify/storage";
+import { apiListMedia } from "./adminApi";
 
 const IMG_RE = /\.(jpe?g|png|webp|gif|avif)$/i;
 export const KEEP = ".keep"; // 0-byte marker so empty folders persist in S3
@@ -28,17 +28,11 @@ export function withTimeout<T>(p: Promise<T>, ms: number, label = "操作"): Pro
   ]);
 }
 
-/** All visible media keys, media-relative (the leading "media/" is stripped). */
+/** All visible media keys (media-relative). Listing runs server-side via the
+ *  API route — the browser can't reach S3 directly from China. */
 export async function listAllMediaKeys(): Promise<string[]> {
-  const res = await withTimeout(
-    list({ path: "media/", options: { listAll: true } }),
-    20000,
-    "列素材库"
-  );
-  const keys = res.items
-    .map((i) => i.path.replace(/^media\//, ""))
-    .filter(isVisible);
-  return Array.from(new Set(keys));
+  const keys = await withTimeout(apiListMedia(), 20000, "列素材库");
+  return Array.from(new Set(keys.filter(isVisible)));
 }
 
 export type MediaNode = { folders: string[]; images: string[] };

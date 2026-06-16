@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { uploadData, downloadData, getUrl } from "aws-amplify/storage";
+import { mediaUrl } from "@/lib/media";
 import {
   DndContext,
   closestCenter,
@@ -21,9 +21,7 @@ import seed from "../../../content/galleries.json";
 import type { Gallery, GalleriesManifest, MediaItem } from "@/types/gallery";
 import { MediaPicker } from "./MediaPicker";
 import { uploadToLibrary } from "./mediaUpload";
-import { withTimeout } from "./mediaTree";
-
-const MANIFEST_PATH = "media/galleries.json";
+import { cdnJson, apiSave } from "./adminApi";
 
 function slugify(s: string): string {
   const a = s
@@ -44,20 +42,11 @@ function readDims(src: File | string): Promise<{ w: number; h: number }> {
 }
 
 function Thumb({ item }: { item: MediaItem }) {
-  const [url, setUrl] = useState(
-    item.src && item.src.startsWith("http") ? item.src : ""
-  );
-  useEffect(() => {
-    let active = true;
-    if (!url) {
-      getUrl({ path: `media/${item.key}` })
-        .then((r) => active && setUrl(r.url.toString()))
-        .catch(() => {});
-    }
-    return () => {
-      active = false;
-    };
-  }, [item.key, url]);
+  // CDN URL (reachable in CN); seed items already carry an http src.
+  const url =
+    item.src && item.src.startsWith("http")
+      ? item.src
+      : mediaUrl({ key: item.key, src: "" });
 
   return url ? (
     // eslint-disable-next-line @next/next/no-img-element
@@ -131,19 +120,10 @@ export function GalleryManager({ onSignOut }: { onSignOut?: () => void }) {
 
   useEffect(() => {
     (async () => {
-      try {
-        const { body } = await withTimeout(
-          downloadData({ path: MANIFEST_PATH }).result,
-          15000,
-          "加载相册"
-        );
-        const data = JSON.parse(await body.text()) as GalleriesManifest;
-        setGalleries(data.galleries ?? []);
-      } catch {
-        setGalleries((seed as GalleriesManifest).galleries);
-      } finally {
-        setLoading(false);
-      }
+      // read the manifest via the CDN (reachable in CN); fall back to the seed
+      const data = await cdnJson<GalleriesManifest>("galleries.json");
+      setGalleries(data?.galleries ?? (seed as GalleriesManifest).galleries);
+      setLoading(false);
     })();
   }, []);
 
@@ -260,16 +240,14 @@ export function GalleryManager({ onSignOut }: { onSignOut?: () => void }) {
     setMsg("");
     try {
       const normalized = galleries.map((g) => ({ ...g, count: g.items.length }));
-      await uploadData({
-        path: MANIFEST_PATH,
-        data: new Blob([JSON.stringify({ galleries: normalized }, null, 2)], {
-          type: "application/json",
-        }),
-        options: { contentType: "application/json" },
-      }).result;
+      await apiSave(
+        "galleries.json",
+        JSON.stringify({ galleries: normalized }, null, 2),
+        "application/json"
+      );
       setMsg("已保存 ✓ 线上约 1 分钟内更新");
-    } catch {
-      setMsg("保存失败,请重试");
+    } catch (e) {
+      setMsg(e instanceof Error ? e.message : "保存失败,请重试");
     } finally {
       setSaving(false);
     }
