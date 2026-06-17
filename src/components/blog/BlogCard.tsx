@@ -39,10 +39,8 @@ export function BlogCard({ post }: BlogCardProps) {
         </Link>
       )}
 
-      <div className={clsx(!hasImage && "mx-auto max-w-2xl text-center")}>
-        <p className="font-heading text-lg italic text-muted">
-          {shortDate(post.date)}
-        </p>
+      <div className={clsx(!hasImage && "max-w-3xl")}>
+        <p className="font-heading text-lg text-muted">{shortDate(post.date)}</p>
 
         <Link href={href} className="group">
           <h2 className="mt-2 font-heading text-4xl font-semibold leading-tight tracking-tight transition-colors group-hover:text-accent md:text-5xl">
@@ -50,13 +48,19 @@ export function BlogCard({ post }: BlogCardProps) {
           </h2>
         </Link>
 
-        <p className="mt-5 line-clamp-3 leading-relaxed text-foreground/80 md:text-lg">
-          {post.excerpt}
-        </p>
+        <div className="mt-5 space-y-4 leading-relaxed text-foreground/80 md:text-lg">
+          {post.excerpt
+            .split(/\n+/)
+            .map((p) => p.trim())
+            .filter(Boolean)
+            .map((para, i) => (
+              <p key={i}>{para}</p>
+            ))}
+        </div>
 
         <Link
           href={href}
-          className="mt-6 inline-block font-heading text-lg italic text-accent underline decoration-1 underline-offset-4 transition-colors hover:text-accent-hover"
+          className="mt-6 inline-block font-heading text-lg font-semibold underline decoration-1 underline-offset-4 transition-colors hover:text-accent"
         >
           Read More
         </Link>
